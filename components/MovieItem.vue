@@ -1,27 +1,24 @@
 <template>
   <v-card class="mx-auto" max-width="400" :to="'/movie/' + id">
-    <v-img
-      class="white--text align-end"
-      height="200px"
-      src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-    >
+    <v-img class="white--text align-end" height="200px" :src="image">
       <v-card-title>{{ title }}</v-card-title>
     </v-img>
 
-    <v-card-text class="text--primary">
-      <div>{{ summary }}</div>
+    <v-card-text class="text--primary text-justify">
+      {{ limitString(replaceTagHtml(summary)) }}
     </v-card-text>
 
     <v-card-actions>
+      <v-icon class="mr-3">mdi-star</v-icon>
       {{ rating }}
-      <v-spacer />
-      <v-rating v-model="rating" half-icon size="16"></v-rating>
     </v-card-actions>
   </v-card>
 </template>
 
 <script>
+import helper from '~/mixins/helper'
 export default {
+  mixins: [helper],
   props: {
     id: {
       type: Number,

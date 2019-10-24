@@ -31,7 +31,7 @@
           offset-y
           min-width="290px"
         >
-          <template v-slot:activator="{ on }">
+          <template slot="activator">
             <v-text-field
               v-model="dateSearch"
               outlined
@@ -40,7 +40,7 @@
               flat
               placeholder="Pilih tanggal"
               readonly
-              v-on="on"
+              @click:prepend-inner="picker = true"
             />
           </template>
           <v-date-picker
@@ -54,19 +54,15 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col
-        v-for="i in movie_search.length == 0 ? movies : movie_search"
-        :key="i.id"
-        cols="12"
-        lg="3"
-        md="4"
-        sm="6"
-      >
+      <v-col v-for="i in movies" :key="i.id" cols="12" lg="3" md="4" sm="6">
         <MovieItem
-          :id="i.id"
-          :title="i.title"
-          :summary="i.summary"
-          :rating="i.rating"
+          :id="i.show ? i.show.id : i._embedded.show.id"
+          :title="i.show ? i.show.name : i.name"
+          :summary="i.show ? i.show.summary : i.summary"
+          :rating="
+            i.show ? i.show.rating.average : i._embedded.show.rating.average
+          "
+          :image="i.show ? i.show.image.medium : i.image.medium"
         />
       </v-col>
     </v-row>
@@ -85,59 +81,57 @@ export default {
       movies: [],
       search: null,
       picker: false,
-      dateSearch: null,
-      movie_search: []
+      dateSearch: null
     }
   },
   watch: {
-    dateSearch() {
-      this.movies = [
-        {
-          id: 1,
-          title: 'Lorem 1',
-          summary: 'Lorem ipusakjasf',
-          rating: 4.5
-        }
-      ]
+    async dateSearch(value) {
+      this.movies = []
+      this.movies = await this.$axios
+        .$get(process.env.base_url + '/schedule?country=US&date=' + value)
+        .then((res) => {
+          return res.filter(
+            (item) =>
+              item.show.image !== null &&
+              item.show.summary !== null &&
+              item.show.rating.average
+          )
+        })
     },
     search(value) {
-      this.movie_search = []
-      this.movies.forEach((item) => {
-        console.log(item.title.includes(value))
-        console.log(value)
-        if (item.title.toLowerCase().includes(value.toLowerCase())) {
-          this.movie_search.push(item)
-        }
-      })
+      this.fetchSearchData(value)
     }
   },
   created() {
-    this.movies = [
-      {
-        id: 1,
-        title: 'Jumanji 2',
-        summary: 'Lorem ipusakjasf',
-        rating: 4.5
-      },
-      {
-        id: 2,
-        title: 'Spiderman 2',
-        summary: 'Lorem ipusakjasf',
-        rating: 3.5
-      },
-      {
-        id: 3,
-        title: 'Meteor Garden',
-        summary: 'Lorem ipusakjasf',
-        rating: 2
-      },
-      {
-        id: 4,
-        title: 'Fantasic 4',
-        summary: 'Lorem ipusakjasf',
-        rating: 5
-      }
-    ]
+    this.fetchData()
+  },
+  methods: {
+    async fetchData() {
+      this.movies = await this.$axios
+        .$get(process.env.base_url + '/schedule/full')
+        .then((res) => {
+          // console.log(res[0]._embedded.show.rating.average)
+          return res.filter(
+            (item) =>
+              item.image !== null &&
+              item.summary !== null &&
+              item._embedded.show.rating.average
+          )
+        })
+    },
+    async fetchSearchData(param) {
+      this.movies = []
+      this.movies = await this.$axios
+        .$get(process.env.base_url + '/search/shows?q=' + param)
+        .then((res) => {
+          return res.filter(
+            (item) =>
+              item.show.image !== null &&
+              item.show.summary !== null &&
+              item.show.rating.average
+          )
+        })
+    }
   }
 }
 </script>

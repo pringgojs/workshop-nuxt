@@ -27,6 +27,10 @@ export default {
    ** Global CSS
    */
   css: [],
+  /**
+   * Mix in register
+   */
+  watch: ['~/mixins/**/*.js'],
   /*
    ** Plugins to load before mounting the App
    */
@@ -90,5 +94,8 @@ export default {
      ** You can extend webpack config here
      */
     extend(config, ctx) {}
+  },
+  env: {
+    base_url: 'http://api.tvmaze.com'
   }
 }

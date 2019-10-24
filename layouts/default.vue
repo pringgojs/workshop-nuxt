@@ -1,7 +1,7 @@
 <template>
   <v-app light>
     <v-app-bar :clipped-left="clipped" fixed app color="primary" dark>
-      <v-btn text to="/" v-text="title" />
+      <v-btn text to="/">Belajar Vuex</v-btn>
       <!-- <v-menu offset-y>
         <template>
           <v-text-field
