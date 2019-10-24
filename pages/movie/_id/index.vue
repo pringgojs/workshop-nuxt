@@ -13,6 +13,12 @@
           <v-card-text>
             {{ summary ? replaceTagHtml(summary) : '' }}
           </v-card-text>
+          <v-card-action>
+            <v-chip class="ma-2" color="pink" label text-color="white">
+              <v-icon left> mdi-label </v-icon>
+              {{ genres }}
+            </v-chip>
+          </v-card-action>
         </v-card>
         <v-list-item three-line>
           <v-btn rounded color="primary" class="text-none" to="/">
@@ -33,7 +39,8 @@ export default {
       image: null,
       summary: null,
       title: null,
-      rating: null
+      rating: null,
+      genres: []
     }
   },
   created() {
@@ -44,6 +51,7 @@ export default {
       this.summary = res.summary
       this.title = res.name
       this.rating = res.rating.average
+      this.genres = res.genres.join(', ')
     })
   }
 }
